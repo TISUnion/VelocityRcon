@@ -81,7 +81,7 @@ public class VelocityRcon {
     private void startListener() {
         InetSocketAddress address = new InetSocketAddress(rconHost, rconPort);
         rconServer = new RconServer(server, rconPassword);
-        logger.info("Binding rcon to address: /" + address.getHostName() + ":" + address.getPort());
+        logger.info("Binding rcon to address: /" + rconHost + ":" + address.getPort());
 
         ChannelFuture future = rconServer.bind(address);
         Channel channel = future.awaitUninterruptibly().channel();
