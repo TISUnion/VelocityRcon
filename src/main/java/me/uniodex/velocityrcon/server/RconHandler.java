@@ -5,8 +5,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import me.uniodex.velocityrcon.VelocityRcon;
 import me.uniodex.velocityrcon.commandsource.IRconCommandSource;
-import me.uniodex.velocityrcon.utils.Utils;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -84,36 +86,39 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
         boolean stop = false;
         boolean success;
-        String message;
+        Component message;
 
         if (payload.equalsIgnoreCase("end") || payload.equalsIgnoreCase("stop")) {
             stop = true;
             success = true;
-            message = "Shutting down the proxy...";
+            message = Component.text("Shutting down the proxy...");
         } else {
             try {
                 success = rconServer.getServer().getCommandManager().executeAsync(commandSender, payload).join();
                 if (success) {
                     message = commandSender.flush();
                 } else {
-                    message = NamedTextColor.RED + "No such command";
+                    message = Component.text("No such command", NamedTextColor.RED);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 success = false;
-                message = NamedTextColor.RED + "Unknown error";
+                message = Component.text("Unknown error", NamedTextColor.RED);
             }
         }
 
         if (!success) {
-            message = String.format("Error executing: %s (%s)", payload, message);
+            message = Component.text(String.format("Error executing: %s (%s)", payload, message));
         }
 
-        if (!VelocityRcon.getInstance().isRconColored()) {
-            message = Utils.stripColor(message);
+        String messageStr;
+        if (VelocityRcon.getInstance().isRconColored()) {
+            messageStr = LegacyComponentSerializer.legacySection().serialize(message);
+        } else {
+            messageStr = PlainTextComponentSerializer.plainText().serialize(message);
         }
 
-        sendLargeResponse(ctx, requestId, message);
+        sendLargeResponse(ctx, requestId, messageStr);
 
         if (stop) {
             rconServer.getServer().shutdown();
