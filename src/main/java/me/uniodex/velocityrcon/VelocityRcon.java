@@ -30,6 +30,8 @@ public class VelocityRcon {
     private final Logger logger;
 
     @Getter
+    private boolean rconEnabled = false;
+    @Getter
     private String rconHost = "127.0.0.1";
     @Getter
     private int rconPort = 1337;
@@ -53,6 +55,7 @@ public class VelocityRcon {
             return;
         }
 
+        rconEnabled = toml.getBoolean("rcon-enabled");
         if (Utils.isInteger(toml.getString("rcon-port"))) {
             rconPort = Integer.valueOf(toml.getString("rcon-port"));
         } else {
@@ -79,6 +82,11 @@ public class VelocityRcon {
     }
 
     private void startListener() {
+        if (!rconEnabled) {
+            logger.info("Rcon disabled");
+            return;
+        }
+
         InetSocketAddress address = new InetSocketAddress(rconHost, rconPort);
         rconServer = new RconServer(server, rconPassword);
         logger.info("Binding rcon to address: /" + rconHost + ":" + address.getPort());
