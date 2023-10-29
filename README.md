@@ -12,7 +12,7 @@ You should use RCON for these situations:
 [More information](https://wiki.vg/RCON)
 
 # Installation
-- Download [VelocityRcon.jar](https://github.com/UnioDex/VelocityRcon/releases/download/v1.0/VelocityRcon.jar)
+- Download [VelocityRcon.jar](https://github.com/TISUnion/VelocityRcon/releases)
 - Put it to your Velocity/plugins folder.
 - Configure port and password.
 - You are ready to use!
